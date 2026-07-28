@@ -8,7 +8,7 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const { agency_id } = req.query;
 
-    let query = supabase.from('clients').select('*');
+    let query = supabase().from('clients').select('*');
 
     if (agency_id) {
       if (typeof agency_id !== 'string' || !isValidUUID(agency_id)) {
@@ -41,7 +41,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'id must be a valid UUID' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('clients')
       .select('*')
       .eq('id', id)
@@ -78,7 +78,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'company must be a non-empty string' });
     }
 
-    const { data: agencyCheck } = await supabase
+    const { data: agencyCheck } = await supabase()
       .from('agencies')
       .select('id')
       .eq('id', agency_id)
@@ -88,7 +88,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Referenced agency does not exist' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('clients')
       .insert({ agency_id, name: name.trim(), company: company.trim() })
       .select()

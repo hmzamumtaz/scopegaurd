@@ -12,7 +12,7 @@ router.get('/', async (req: Request, res: Response) => {
     const { client_id, ai_verdict, status, limit: limitStr } = req.query;
     const limit = Math.min(Math.max(parseInt(String(limitStr || '50'), 10) || 50, 1), 200);
 
-    let query = supabase.from('requests').select(`
+    let query = supabase().from('requests').select(`
       *,
       clients!inner(name, company)
     `);
@@ -66,7 +66,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'id must be a valid UUID' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('requests')
       .select(`
         *,
@@ -102,7 +102,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
       });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('requests')
       .update({ status })
       .eq('id', id)

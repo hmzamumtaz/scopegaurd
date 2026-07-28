@@ -52,7 +52,7 @@ router.post('/', upload.single('sow_file'), async (req: Request, res: Response) 
     console.log(`Generating SOW summary for client ${client_id}...`);
     const summary = await generateSowSummary(rawText);
 
-    const { data: sow, error } = await supabase
+    const { data: sow, error } = await supabase()
       .from('sows')
       .insert({ client_id, raw_text: rawText, summary })
       .select()

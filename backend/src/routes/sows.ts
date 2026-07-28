@@ -8,7 +8,7 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const { client_id } = req.query;
 
-    let query = supabase.from('sows').select('*');
+    let query = supabase().from('sows').select('*');
 
     if (client_id) {
       if (typeof client_id !== 'string' || !isValidUUID(client_id)) {
@@ -41,7 +41,7 @@ router.get('/latest/:client_id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'client_id must be a valid UUID' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('sows')
       .select('*')
       .eq('client_id', client_id)
@@ -68,7 +68,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'id must be a valid UUID' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('sows')
       .select('*')
       .eq('id', id)

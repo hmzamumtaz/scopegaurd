@@ -41,7 +41,7 @@ router.post('/:client_id', async (req: Request, res: Response) => {
       });
     }
 
-    const { data: sow, error: sowError } = await supabase
+    const { data: sow, error: sowError } = await supabase()
       .from('sows')
       .select('raw_text')
       .eq('client_id', client_id)
@@ -62,7 +62,7 @@ router.post('/:client_id', async (req: Request, res: Response) => {
 
     const validVerdict = isValidScopeVerdict(verdict) ? verdict : 'unclear';
 
-    const { data: requestRecord, error: insertError } = await supabase
+    const { data: requestRecord, error: insertError } = await supabase()
       .from('requests')
       .insert({
         client_id,

@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/', async (_req: Request, res: Response) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('agencies')
       .select('*')
       .order('created_at', { ascending: false })
@@ -36,7 +36,7 @@ router.post('/lookup', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'owner_email must be a valid email address' });
     }
 
-    const { data: existing, error: findError } = await supabase
+    const { data: existing, error: findError } = await supabase()
       .from('agencies')
       .select('*')
       .eq('owner_email', owner_email.trim())
@@ -52,7 +52,7 @@ router.post('/lookup', async (req: Request, res: Response) => {
     }
 
     const defaultName = owner_email.split('@')[0] + "'s Agency";
-    const { data: created, error: createError } = await supabase
+    const { data: created, error: createError } = await supabase()
       .from('agencies')
       .insert({ name: defaultName, owner_email: owner_email.trim() })
       .select()
@@ -83,7 +83,7 @@ router.patch('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'name is required and must be a non-empty string' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('agencies')
       .update({ name: name.trim() })
       .eq('id', id)
@@ -109,7 +109,7 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'id must be a valid UUID' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('agencies')
       .select('*')
       .eq('id', id)
@@ -142,7 +142,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'owner_email must be a valid email address' });
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase()
       .from('agencies')
       .insert({ name: name.trim(), owner_email: owner_email.trim() })
       .select()

@@ -110,7 +110,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'agency_id is required and must be a valid UUID' });
     }
 
-    const { data: agency, error: agencyError } = await supabase
+    const { data: agency, error: agencyError } = await supabase()
       .from('agencies')
       .select('id')
       .eq('id', agency_id)
@@ -120,7 +120,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Agency not found' });
     }
 
-    const { data: existingClients } = await supabase
+    const { data: existingClients } = await supabase()
       .from('clients')
       .select('id')
       .eq('agency_id', agency_id)
@@ -130,7 +130,7 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(200).json({ message: 'Demo data already loaded for this agency' });
     }
 
-    const { data: client1, error: c1Err } = await supabase
+    const { data: client1, error: c1Err } = await supabase()
       .from('clients')
       .insert({ agency_id, name: 'Sarah Chen', company: 'Brightside Marketing' })
       .select()
@@ -138,7 +138,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     if (c1Err) throw new Error('Failed to create client 1');
 
-    const { data: client2, error: c2Err } = await supabase
+    const { data: client2, error: c2Err } = await supabase()
       .from('clients')
       .insert({ agency_id, name: 'Marcus Webb', company: 'Nexus Technologies' })
       .select()
@@ -146,7 +146,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     if (c2Err) throw new Error('Failed to create client 2');
 
-    const { error: s1Err } = await supabase.from('sows').insert({
+    const { error: s1Err } = await supabase().from('sows').insert({
       client_id: client1.id,
       raw_text: SOW_TEXTS[0],
       summary:
@@ -155,7 +155,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     if (s1Err) throw new Error('Failed to create SOW 1');
 
-    const { error: s2Err } = await supabase.from('sows').insert({
+    const { error: s2Err } = await supabase().from('sows').insert({
       client_id: client2.id,
       raw_text: SOW_TEXTS[1],
       summary:
@@ -173,7 +173,7 @@ router.post('/', async (req: Request, res: Response) => {
       status: 'pending',
     }));
 
-    const { error: rErr } = await supabase.from('requests').insert(requestInserts);
+    const { error: rErr } = await supabase().from('requests').insert(requestInserts);
 
     if (rErr) throw new Error('Failed to create requests');
 
