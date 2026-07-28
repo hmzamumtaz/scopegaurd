@@ -1,16 +1,19 @@
 import OpenAI from 'openai';
 
-const apiKey = process.env.OPENAI_API_KEY;
+let _openai: OpenAI | null = null;
 
-if (!apiKey) {
-  console.error('Missing OPENAI_API_KEY environment variable');
-  process.exit(1);
+function getOpenai() {
+  if (_openai) return _openai;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('Missing OPENAI_API_KEY environment variable');
+  }
+  _openai = new OpenAI({ apiKey });
+  return _openai;
 }
 
-export const openai = new OpenAI({ apiKey });
-
 export async function generateSowSummary(rawText: string): Promise<string> {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenai().chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       {
@@ -46,7 +49,7 @@ export async function evaluateScope(
   sowText: string,
   messageText: string
 ): Promise<ScopeEvaluation> {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenai().chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [
       {
