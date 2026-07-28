@@ -67,6 +67,12 @@ export default function ClientsPage() {
     if (agency) fetchClients();
   }, [agency, fetchClients]);
 
+  useEffect(() => {
+    if (!agencyLoading && !agency) {
+      router.push('/login');
+    }
+  }, [agency, agencyLoading, router]);
+
   const handleCreate = async () => {
     if (!newName.trim() || !newCompany.trim()) return;
     setCreating(true);
@@ -92,12 +98,6 @@ export default function ClientsPage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (!agencyLoading && !agency) {
-      router.push('/login');
-    }
-  }, [agency, agencyLoading, router]);
 
   if (!agency) return null;
 

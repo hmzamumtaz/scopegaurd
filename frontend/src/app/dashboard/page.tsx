@@ -43,6 +43,12 @@ export default function DashboardPage() {
     };
   }, [agency, fetchAlerts]);
 
+  useEffect(() => {
+    if (!agencyLoading && !agency) {
+      router.push('/login');
+    }
+  }, [agency, agencyLoading, router]);
+
   const handleRemoved = (id: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   };
@@ -57,12 +63,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (!agencyLoading && !agency) {
-      router.push('/login');
-    }
-  }, [agency, agencyLoading, router]);
 
   if (!agency) return null;
 
