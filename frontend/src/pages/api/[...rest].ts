@@ -1,16 +1,21 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import express from 'express';
-import serverless from 'serverless-http';
 import { MulterError } from 'multer';
-import parseSowRouter from '../src/server/routes/parseSow';
-import webhookRouter from '../src/server/routes/webhook';
-import requestsRouter from '../src/server/routes/requests';
-import agenciesRouter from '../src/server/routes/agencies';
-import clientsRouter from '../src/server/routes/clients';
-import sowsRouter from '../src/server/routes/sows';
-import seedRouter from '../src/server/routes/seed';
+import parseSowRouter from '../../server/routes/parseSow';
+import webhookRouter from '../../server/routes/webhook';
+import requestsRouter from '../../server/routes/requests';
+import agenciesRouter from '../../server/routes/agencies';
+import clientsRouter from '../../server/routes/clients';
+import sowsRouter from '../../server/routes/sows';
+import seedRouter from '../../server/routes/seed';
 
 const app = express();
+
 app.use(express.json({ limit: '1mb' }));
+
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', service: 'scopeguard-backend' });
+});
 
 app.use('/api/parse-sow', parseSowRouter);
 app.use('/api/webhook', webhookRouter);
@@ -37,5 +42,6 @@ app.use((err: Error & { type?: string }, _req: express.Request, res: express.Res
   return res.status(500).json({ error: 'Internal server error' });
 });
 
-const handler = serverless(app);
-export default handler;
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  return app(req as any, res as any);
+}
