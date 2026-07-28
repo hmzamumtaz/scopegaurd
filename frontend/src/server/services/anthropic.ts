@@ -1,16 +1,19 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const apiKey = process.env.ANTHROPIC_API_KEY || process.env.anthropic_api_key;
+let _anthropic: Anthropic | null = null;
 
-if (!apiKey) {
-  console.error('Missing ANTHROPIC_API_KEY environment variable');
-  process.exit(1);
+function getAnthropic() {
+  if (_anthropic) return _anthropic;
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.anthropic_api_key;
+  if (!apiKey) {
+    throw new Error('Missing ANTHROPIC_API_KEY environment variable');
+  }
+  _anthropic = new Anthropic({ apiKey });
+  return _anthropic;
 }
 
-export const anthropic = new Anthropic({ apiKey });
-
 export async function generateSowSummary(rawText: string): Promise<string> {
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-5',
     max_tokens: 1000,
     system:
@@ -40,7 +43,7 @@ export async function evaluateScope(
   sowText: string,
   messageText: string
 ): Promise<ScopeEvaluation> {
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-sonnet-5',
     max_tokens: 500,
     system:

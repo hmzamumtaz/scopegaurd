@@ -11,7 +11,8 @@ import seedRouter from '../../server/routes/seed';
 
 const app = express();
 
-app.use(express.json({ limit: '1mb' }));
+// Next.js already parses JSON bodies; skip express.json() to avoid
+// "stream.not.readable" errors when the body stream is already consumed.
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'scopeguard-backend' });
