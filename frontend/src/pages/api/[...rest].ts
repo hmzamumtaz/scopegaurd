@@ -43,5 +43,14 @@ app.use((err: Error & { type?: string }, _req: express.Request, res: express.Res
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  return app(req as any, res as any);
+  await new Promise<void>((resolve, reject) => {
+    app(req as any, res as any, (err: unknown) => {
+      if (err) {
+        console.error('Express error:', err);
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
