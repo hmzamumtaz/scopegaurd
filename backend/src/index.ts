@@ -8,6 +8,7 @@ import requestsRouter from './routes/requests';
 import agenciesRouter from './routes/agencies';
 import clientsRouter from './routes/clients';
 import sowsRouter from './routes/sows';
+import seedRouter from './routes/seed';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/requests', requestsRouter);
 app.use('/api/agencies', agenciesRouter);
 app.use('/api/clients', clientsRouter);
 app.use('/api/sows', sowsRouter);
+app.use('/api/seed', seedRouter);
 
 app.use((err: Error & { type?: string }, _req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof MulterError) {

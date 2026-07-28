@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import Sidebar from '@/components/Sidebar';
+import LayoutShell from './LayoutShell';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,11 +28,8 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="h-full flex">
-        <Sidebar />
-        <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900">
-          {children}
-        </main>
+      <body className="h-full">
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );

@@ -1,13 +1,21 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import SOWUploader from '@/components/SOWUploader';
-import AgencySetup from '@/components/AgencySetup';
 import { useAgency } from '@/lib/useAgency';
 
 export default function SOWUploadPage() {
-  const { agency, loading, setupAgency } = useAgency();
+  const router = useRouter();
+  const { agency, loading } = useAgency();
+
+  useEffect(() => {
+    if (!loading && !agency) {
+      router.push('/login');
+    }
+  }, [agency, loading, router]);
 
   if (loading) {
     return (
@@ -18,9 +26,7 @@ export default function SOWUploadPage() {
     );
   }
 
-  if (!agency) {
-    return <AgencySetup onSetup={setupAgency} />;
-  }
+  if (!agency) return null;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">

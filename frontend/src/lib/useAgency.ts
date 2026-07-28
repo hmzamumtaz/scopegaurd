@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getAgencies, createAgency } from './api';
+import { getAgency, lookupAgency as lookupAgencyApi } from './api';
 import type { Agency } from './types';
 
 const STORAGE_KEY = 'scopeguard_agency_id';
@@ -18,7 +18,15 @@ function safeStorageSet(key: string, value: string): void {
   try {
     localStorage.setItem(key, value);
   } catch {
-    // localStorage unavailable (private browsing, full, etc.)
+    // localStorage unavailable
+  }
+}
+
+function safeStorageRemove(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // localStorage unavailable
   }
 }
 
@@ -35,23 +43,20 @@ export function useAgency() {
 
     try {
       setError('');
-      const res = await getAgencies();
-      if (!mountedRef.current) return;
-
       const storedId = safeStorageGet(STORAGE_KEY);
 
-      if (res.agencies.length === 0) {
-        setAgency(null);
-      } else if (res.agencies.length === 1) {
-        setAgency(res.agencies[0]);
-        safeStorageSet(STORAGE_KEY, res.agencies[0].id);
+      if (!storedId) {
+        if (mountedRef.current) setAgency(null);
       } else {
-        const match = res.agencies.find((a) => a.id === storedId);
-        setAgency(match || res.agencies[0]);
-        if (!match) safeStorageSet(STORAGE_KEY, res.agencies[0].id);
+        const res = await getAgency(storedId);
+        if (mountedRef.current) setAgency(res.agency);
       }
     } catch {
-      if (mountedRef.current) setError('Failed to connect to server. Is the backend running?');
+      safeStorageRemove(STORAGE_KEY);
+      if (mountedRef.current) {
+        setAgency(null);
+        setError('Failed to load agency');
+      }
     } finally {
       loadingRef.current = false;
       if (mountedRef.current) setLoading(false);
@@ -65,26 +70,19 @@ export function useAgency() {
     };
   }, [load]);
 
-  const selectAgency = (a: Agency) => {
-    setAgency(a);
-    safeStorageSet(STORAGE_KEY, a.id);
-  };
-
-  const setupAgency = async (name: string, owner_email: string) => {
+  const login = async (owner_email: string): Promise<Agency> => {
     setError('');
-    try {
-      const res = await createAgency(name, owner_email);
-      if (!mountedRef.current) return res.agency;
-      setAgency(res.agency);
-      safeStorageSet(STORAGE_KEY, res.agency.id);
-      return res.agency;
-    } catch (err: unknown) {
-      if (!mountedRef.current) throw err;
-      const msg = err instanceof Error ? err.message : 'Failed to create agency';
-      setError(msg);
-      throw err;
-    }
+    const res = await lookupAgencyApi(owner_email);
+    if (!mountedRef.current) return res.agency;
+    setAgency(res.agency);
+    safeStorageSet(STORAGE_KEY, res.agency.id);
+    return res.agency;
   };
 
-  return { agency, loading, error, selectAgency, setupAgency, reload: load };
+  const logout = () => {
+    safeStorageRemove(STORAGE_KEY);
+    setAgency(null);
+  };
+
+  return { agency, loading, error, login, logout, reload: load };
 }

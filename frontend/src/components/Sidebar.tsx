@@ -19,7 +19,7 @@ const navItems = [
   { href: '/clients', label: 'Clients', icon: FileText },
   { href: '/sows/upload', label: 'Contracts / SOWs', icon: Upload },
   { href: '/dashboard', label: 'Alerts', icon: Bell },
-  { href: '#', label: 'Settings', icon: Settings },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -27,7 +27,6 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const isActive = (href: string) => {
-    if (href === '#') return false;
     if (href === '/dashboard') return pathname === href || pathname === '/';
     return pathname === href;
   };

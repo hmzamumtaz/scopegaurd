@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Building2, FileText, Plus, Loader2, AlertTriangle, WifiOff } from 'lucide-react';
 import Link from 'next/link';
 import { useAgency } from '@/lib/useAgency';
 import { getClients, createClient, getSows, getRequests } from '@/lib/api';
 import type { Client, Sow, RequestRecord } from '@/lib/types';
-import AgencySetup from '@/components/AgencySetup';
 
 interface EnrichedClient extends Client {
   sowCount: number;
@@ -14,7 +14,8 @@ interface EnrichedClient extends Client {
 }
 
 export default function ClientsPage() {
-  const { agency, loading: agencyLoading, setupAgency } = useAgency();
+  const router = useRouter();
+  const { agency, loading: agencyLoading } = useAgency();
   const [clients, setClients] = useState<EnrichedClient[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
@@ -92,9 +93,13 @@ export default function ClientsPage() {
     );
   }
 
-  if (!agency) {
-    return <AgencySetup onSetup={setupAgency} />;
-  }
+  useEffect(() => {
+    if (!agencyLoading && !agency) {
+      router.push('/login');
+    }
+  }, [agency, agencyLoading, router]);
+
+  if (!agency) return null;
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">

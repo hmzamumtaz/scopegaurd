@@ -73,6 +73,27 @@ export async function createAgency(name: string, owner_email: string) {
   });
 }
 
+export async function lookupAgency(owner_email: string) {
+  return request<{ agency: import('./types').Agency }>('/agencies/lookup', {
+    method: 'POST',
+    body: JSON.stringify({ owner_email }),
+  });
+}
+
+export async function updateAgency(id: string, name: string) {
+  return request<{ agency: import('./types').Agency }>(`/agencies/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function seedData(agency_id: string) {
+  return request<{ message: string }>('/seed', {
+    method: 'POST',
+    body: JSON.stringify({ agency_id }),
+  });
+}
+
 export async function getClients(agencyId?: string) {
   const qs = agencyId ? `?agency_id=${agencyId}` : '';
   return request<{ clients: import('./types').Client[] }>(`/clients${qs}`);

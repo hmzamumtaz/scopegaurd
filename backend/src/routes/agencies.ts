@@ -24,6 +24,83 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 });
 
+router.post('/lookup', async (req: Request, res: Response) => {
+  try {
+    const { owner_email } = req.body;
+
+    if (!owner_email || typeof owner_email !== 'string' || !owner_email.trim()) {
+      return res.status(400).json({ error: 'owner_email is required' });
+    }
+
+    if (!isValidEmail(owner_email.trim())) {
+      return res.status(400).json({ error: 'owner_email must be a valid email address' });
+    }
+
+    const { data: existing, error: findError } = await supabase
+      .from('agencies')
+      .select('*')
+      .eq('owner_email', owner_email.trim())
+      .maybeSingle();
+
+    if (findError) {
+      console.error('Supabase lookup error:', findError);
+      return res.status(500).json({ error: 'Failed to look up agency' });
+    }
+
+    if (existing) {
+      return res.status(200).json({ agency: existing });
+    }
+
+    const defaultName = owner_email.split('@')[0] + "'s Agency";
+    const { data: created, error: createError } = await supabase
+      .from('agencies')
+      .insert({ name: defaultName, owner_email: owner_email.trim() })
+      .select()
+      .single();
+
+    if (createError) {
+      console.error('Supabase insert error:', createError);
+      return res.status(500).json({ error: 'Failed to create agency' });
+    }
+
+    return res.status(201).json({ agency: created });
+  } catch (err) {
+    console.error('POST /api/agencies/lookup error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.patch('/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ error: 'id must be a valid UUID' });
+    }
+
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ error: 'name is required and must be a non-empty string' });
+    }
+
+    const { data, error } = await supabase
+      .from('agencies')
+      .update({ name: name.trim() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({ error: 'Agency not found' });
+    }
+
+    return res.status(200).json({ agency: data });
+  } catch (err) {
+    console.error('PATCH /api/agencies/:id error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

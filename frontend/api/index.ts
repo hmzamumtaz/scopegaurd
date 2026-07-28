@@ -7,6 +7,7 @@ import requestsRouter from '../src/server/routes/requests';
 import agenciesRouter from '../src/server/routes/agencies';
 import clientsRouter from '../src/server/routes/clients';
 import sowsRouter from '../src/server/routes/sows';
+import seedRouter from '../src/server/routes/seed';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -17,6 +18,7 @@ app.use('/api/requests', requestsRouter);
 app.use('/api/agencies', agenciesRouter);
 app.use('/api/clients', clientsRouter);
 app.use('/api/sows', sowsRouter);
+app.use('/api/seed', seedRouter);
 
 app.use((err: Error & { type?: string }, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (err instanceof MulterError) {

@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ShieldAlert, DollarSign, Clock, ShieldCheck, WifiOff } from 'lucide-react';
 import { getRequests } from '@/lib/api';
 import { useAgency } from '@/lib/useAgency';
 import type { RequestRecord } from '@/lib/types';
 import MetricCard from '@/components/MetricCard';
 import AlertCard from '@/components/AlertCard';
-import AgencySetup from '@/components/AgencySetup';
 
 export default function DashboardPage() {
-  const { agency, loading: agencyLoading, setupAgency } = useAgency();
+  const router = useRouter();
+  const { agency, loading: agencyLoading } = useAgency();
   const [alerts, setAlerts] = useState<RequestRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
@@ -57,9 +58,13 @@ export default function DashboardPage() {
     );
   }
 
-  if (!agency) {
-    return <AgencySetup onSetup={setupAgency} />;
-  }
+  useEffect(() => {
+    if (!agencyLoading && !agency) {
+      router.push('/login');
+    }
+  }, [agency, agencyLoading, router]);
+
+  if (!agency) return null;
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
